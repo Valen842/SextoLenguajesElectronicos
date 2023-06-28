@@ -1,0 +1,134 @@
+//MEF PULSADOR
+#define RETARDO 40
+#define LED_ROJO 12
+#define LED_VERDE 10
+#define PULSADOR 13
+
+
+void debounceFSM_init();// debe cargar el estado inicial
+void debounceFSM_update();	// debe leer las entradas, resolver la lógica de
+
+// transición de estados y actualizar las salidas
+void buttonPressed();// debe invertir el estado del LED1
+void buttonReleased();// debe invertir el estado del LED2 
+
+
+void inicializacion_display (void);
+
+
+typedef enum{
+  BUTTON_UP,
+  BUTTON_FALLING,
+  BUTTON_DOWN,
+  BUTTON_RISING,
+} debounceState_t;
+
+debounceState_t estadoactual;
+
+//DISPLAY
+char numero[16] = { //LISTA DE LOS ESTADOS DEL DISPLAY
+  //CORRELACIONADOS CON SUS VALORES 0-15
+  B01111110, //		0
+  B00001100, //		1
+  B10110110, //		2
+  B10011110, //		3
+  B11001100, //		4
+  B11011010, //		5
+  B11111010, //		6
+  B00001110, //		7
+  B11111110, //		8
+  B11001110, //		9
+  B10111110, //		a
+  B11111000, //		b
+  B01110010, //		c
+  B10111100, //		d
+  B11110110, //		e
+  B11100010  //		f
+};
+
+int cuentaNum = 1; //valor para que funcione la inicialización en 0
+
+void setup(){
+  
+  //MEF PULSADOR seteo
+  pinMode(PULSADOR, INPUT);
+  pinMode(LED_ROJO, OUTPUT);
+  pinMode(LED_VERDE, OUTPUT);
+  DDRD=B11111111; //INICIALIZACION OBLIGATORIA PUERTO D
+  inicializacion_display(); //INICIALIZACION A 0
+  debounceFSM_init();
+  //Serial.begin(9600); NO SE PUEDE UTILIZAR YA QUE UTILIZA PINES
+  //0 Y 1
+  
+}
+
+void loop(){
+  debounceFSM_update();
+  delay(5); //Para que no se trabe el micro
+}
+
+
+//MEF PULSADOR
+void debounceFSM_init(){
+	estadoactual = BUTTON_UP;
+}
+
+void debounceFSM_update(){
+  static unsigned long previo = millis();
+  
+  switch (estadoactual){
+    case BUTTON_UP:
+        if (digitalRead(PULSADOR) == LOW){
+            estadoactual = BUTTON_FALLING;
+            previo = millis();
+        }
+    	break;
+    
+    case BUTTON_DOWN:
+    	if (digitalRead(PULSADOR) == HIGH){
+            estadoactual = BUTTON_RISING;
+            previo = millis();
+        }
+    	break;
+    
+    case BUTTON_FALLING:
+        if (millis()-previo>=RETARDO){
+          if(digitalRead(PULSADOR)==LOW){
+            buttonPressed();
+            estadoactual = BUTTON_DOWN;
+          }else{
+            estadoactual = BUTTON_UP;
+          }
+        }
+    	break;
+    	
+    case BUTTON_RISING:
+        if (millis()-previo>=RETARDO){
+          if(digitalRead(PULSADOR)==HIGH){
+            buttonReleased();
+            estadoactual = BUTTON_UP;
+          } else{
+            estadoactual = BUTTON_DOWN;
+          }
+        }
+    	break;
+  }
+}
+
+void buttonPressed(){
+ digitalWrite(LED_VERDE, HIGH);
+ digitalWrite(LED_ROJO, LOW);
+ PORTD = numero[cuentaNum];
+ if (cuentaNum == 15) cuentaNum = 0; //RESETEO POST 15
+ else cuentaNum++; //SUMA PRE-15
+  
+}
+
+void buttonReleased(){
+ digitalWrite(LED_VERDE, LOW);
+ digitalWrite(LED_ROJO, HIGH); 
+}
+
+void inicializacion_display (void){
+  PORTD = B01111110;
+}
