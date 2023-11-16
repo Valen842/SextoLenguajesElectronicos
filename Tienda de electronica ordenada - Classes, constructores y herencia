@@ -1,0 +1,102 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Clase principal
+class ProductoElectronico {
+protected:
+    string nombre;
+    int precio;
+    string descripcion;
+    string marca;
+
+public:
+    ProductoElectronico(string nom, int pre, string desc, string mar)
+        : nombre(nom), precio(pre), descripcion(desc), marca(mar) {}
+
+    void mostrarInformacion() {
+        cout << "Nombre: " << nombre << endl;
+        cout << "Precio: " << precio << endl;
+        cout << "Descripción: " << descripcion << endl;
+        cout << "Marca: " << marca << endl;
+    }
+};
+
+// Clase derivada de Telefono
+class Telefono : public ProductoElectronico {
+private:
+    string SisOp;
+    string size;
+
+public:
+    Telefono(string nom, int pre, string desc, string mar, string SOP, string siz)
+        : ProductoElectronico(nom, pre, desc, mar), SisOp(SOP), size(siz) {}
+
+    void mostrarInformacion() {
+        ProductoElectronico::mostrarInformacion();
+        cout << "Sistema operativo: " << SisOp << endl;
+        cout << "Tamaño: " << size << endl;
+    }
+};
+
+// Clase derivada de Computadora
+class Computadora : public ProductoElectronico {
+private:
+    string memoria;
+    string procesador;
+    string SisOp;
+
+public:
+    Computadora(string nom, int pre, string desc, string mar, string mem, string pro, string SOP)
+        : ProductoElectronico(nom, pre, desc, mar), memoria(mem), procesador(pro), SisOp(SOP) {}
+
+    void mostrarInformacion() {
+        ProductoElectronico::mostrarInformacion();
+        cout << "Memoria: " << memoria << endl;
+        cout << "Procesador: " << procesador << endl;
+        cout << "Sistema Operativo: " << SisOp << endl;
+    }
+};
+
+void preguntaDatos() {
+    int tipo;
+    int eleccion;
+
+    cout << "Seleccione el tipo de producto:\n1 - Computadora\n2 - Teléfono" << endl;
+    cin >> tipo;
+
+    if (tipo == 1) {
+        cout << "Seleccione una computadora:\n1 - HP Pavilion\n2 - Dell Inspiron\n3 - MacBook Air" << endl;
+        cin >> eleccion;
+
+        if (eleccion == 1) {
+            Computadora HP("HP Pavilion", 1500, "Computadora", "HP", "128GB", "Intel Core i5-1035G1", "Windows");
+            HP.mostrarInformacion();
+        } else if (eleccion == 2) {
+            Computadora Dell("Inspiron 5567", 1000, "Computadora", "Dell", "500GB", "Intel Core i3/i5/i7 de 7. ª generación", "Windows");
+            Dell.mostrarInformacion();
+        } else if (eleccion == 3) {
+            Computadora Apple("MacBook Air", 1300, "Computadora", "Apple", "256GB", "M1", "macOS");
+            Apple.mostrarInformacion();
+        }
+    } else if (tipo == 2) {
+        cout << "Seleccione un teléfono:\n1 - iPhone 15 Pro Max\n2 - Galaxy Z Fold5\n3 - Mi 9T Pro" << endl;
+        cin >> eleccion;
+
+        if (eleccion == 1) {
+            Telefono iPhone("iPhone 15 Pro Max", 1300, "Smartphone", "Apple", "iOS", "6'5");
+            iPhone.mostrarInformacion();
+        } else if (eleccion == 2) {
+            Telefono Samsung("Galaxy Z Fold5", 999, "Smartphone", "Samsung", "Android", "6'7");
+            Samsung.mostrarInformacion();
+        } else if (eleccion == 3) {
+            Telefono Xiaomi("Mi 9T Pro", 1200, "Smartphone", "Xiaomi", "Android", "6'3");
+            Xiaomi.mostrarInformacion();
+        }
+    }
+}
+
+int main(){
+    preguntaDatos();
+    return 0;
+}
